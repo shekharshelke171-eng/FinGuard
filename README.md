@@ -142,7 +142,7 @@ Open `http://localhost:8501`. The Compose setup stores SQLite data in the named 
 Build the image with the tag referenced in `k8s/finguard.yaml`, make it available to the cluster, then apply the manifest:
 
 ```bash
-docker build -t finguard:1.0.0 .
+docker build -t finguard:1.0.3 .
 kubectl apply -f k8s/finguard.yaml
 kubectl rollout status deployment/finguard -n finguard
 kubectl port-forward service/finguard 8501:8501 -n finguard

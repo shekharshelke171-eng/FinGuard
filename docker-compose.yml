@@ -1,14 +1,14 @@
 services:
   finguard:
     build: .
-    image: finguard:1.0.0
+    image: finguard:1.0.3
     ports:
       - "8501:8501"
     environment:
-      DATABASE_URL: sqlite:////app/database/finguard.db
+      DATABASE_URL: sqlite:////var/lib/finguard/finguard.db
       STREAMLIT_SERVER_HEADLESS: "true"
     volumes:
-      - finguard_database:/app/database
+      - finguard_database:/var/lib/finguard
     read_only: true
     tmpfs:
       - /tmp:mode=1777,size=128m
