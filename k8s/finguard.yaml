@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: finguard
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: finguard-database
+  namespace: finguard
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finguard
+  namespace: finguard
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: finguard
+  template:
+    metadata:
+      labels:
+        app: finguard
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: finguard:1.0.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - python
+            - -m
+            - streamlit
+            - run
+            - dashboard/app.py
+            - --server.address=0.0.0.0
+            - --server.port=8501
+            - --server.headless=true
+          ports:
+            - name: http
+              containerPort: 8501
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              value: sqlite:////app/database/finguard.db
+            - name: HOME
+              value: /tmp
+            - name: MPLCONFIGDIR
+              value: /tmp/matplotlib
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: database
+              mountPath: /app/database
+            - name: temporary
+              mountPath: /tmp
+      volumes:
+        - name: database
+          persistentVolumeClaim:
+            claimName: finguard-database
+        - name: temporary
+          emptyDir:
+            sizeLimit: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: finguard
+  namespace: finguard
+spec:
+  type: ClusterIP
+  selector:
+    app: finguard
+  ports:
+    - name: http
+      port: 8501
+      targetPort: http
+      protocol: TCP

@@ -1,0 +1,23 @@
+
+project:
+  name: FinGuard
+  version: 1.0.0
+  description: Financial Fraud Detection and Analytics System
+
+data:
+  raw_path: data/raw/
+  processed_path: data/processed/
+  target_column: Fraudulent
+
+database:
+  path: database/fraud_detection.db
+
+model:
+  algorithm: RandomForestClassifier
+  test_size: 0.2
+  random_state: 42
+  n_estimators: 200
+
+dashboard:
+  title: FinGuard
+  theme: dark

@@ -1,0 +1,28 @@
+services:
+  finguard:
+    build: .
+    image: finguard:1.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      DATABASE_URL: sqlite:////app/database/finguard.db
+      STREAMLIT_SERVER_HEADLESS: "true"
+    volumes:
+      - finguard_database:/app/database
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=128m
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health')
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  finguard_database:
