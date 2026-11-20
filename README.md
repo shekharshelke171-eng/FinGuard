@@ -152,6 +152,7 @@ Open `http://localhost:8502`. For a remote cluster, push the image to an approve
 
 ## Deployment Links
 
+- Final project report: [Financial Fraud Detection Report (PDF)](documentation/financial-fraud-detection-doc.pdf)
 - Streamlit Cloud: [FinGuard app](https://finguard-fraud-detection.streamlit.app)
 - Docker local app: http://localhost:8501
 - Kubernetes local app: http://localhost:8502
