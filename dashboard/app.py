@@ -1,4 +1,5 @@
 import uuid
+import sys
 from datetime import date, datetime
 from pathlib import Path
 
@@ -6,6 +7,10 @@ import streamlit as st
 import pandas as pd
 import joblib
 import plotly.express as px
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from database.connection import SessionLocal, create_tables
 from database.models import Transaction
@@ -20,7 +25,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = ROOT / "models" / "fraud_detection_model.joblib"
 DATA_PATH = ROOT / "data" / "processed" / "processed_transactions.csv"
 
