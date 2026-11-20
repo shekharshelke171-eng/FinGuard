@@ -102,14 +102,14 @@ pip install -r requirements.txt
 
 ## Dataset and Model Setup
 
-The original and processed transaction datasets are not included in this repository.
+The required raw and processed datasets and trained model are included in this private repository for deployment. Keep the repository private unless you have permission to publish those artifacts.
 
 Place your authorized dataset files in:
 
 - `data/raw/`
 - `data/processed/`
 
-The application also requires the trained model file:
+The application uses the trained model file:
 
 `models/fraud_detection_model.joblib`
 
@@ -145,10 +145,18 @@ Build the image with the tag referenced in `k8s/finguard.yaml`, make it availabl
 docker build -t finguard:1.0.3 .
 kubectl apply -f k8s/finguard.yaml
 kubectl rollout status deployment/finguard -n finguard
-kubectl port-forward service/finguard 8501:8501 -n finguard
+kubectl port-forward service/finguard 8502:8501 -n finguard
 ```
 
-Open `http://localhost:8501`. For a remote cluster, push the image to an approved registry and update the manifest's image reference. The deployment intentionally uses one replica because SQLite is stored on a persistent volume. Use a client/server database and a migration plan before scaling beyond one writer. The manifest does not configure public ingress or authentication; add the protections required by your environment before exposing the service.
+Open `http://localhost:8502`. For a remote cluster, push the image to an approved registry and update the manifest's image reference. The deployment intentionally uses one replica because SQLite is stored on a persistent volume. Use a client/server database and a migration plan before scaling beyond one writer. The manifest does not configure public ingress or authentication; add the protections required by your environment before exposing the service.
+
+## Deployment Links
+
+- Streamlit Cloud: [FinGuard app](https://finguard-fraud-detection.streamlit.app)
+- Docker local app: http://localhost:8501
+- Kubernetes local app: http://localhost:8502
+
+The Docker and Kubernetes addresses are local to the machine running the services. The Streamlit app is private while its Community Cloud sharing setting is private.
 
 ## Machine Learning Model
 
